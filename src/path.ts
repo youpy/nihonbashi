@@ -22,6 +22,7 @@ export type Path<
   : { [str in S]: () => stringifyObj }
 
 export const parsePath = <T extends string>(path: T): Path<T> => {
+  const re = new RegExp('^:')
   const pp = (path: string, base: string, parts: string[]): unknown => {
     // clone parts
     parts = parts.concat()
@@ -30,7 +31,7 @@ export const parsePath = <T extends string>(path: T): Path<T> => {
     const b = base + '/' + path
 
     if (typeof p === 'undefined') {
-      if (new RegExp('^:').test(path)) {
+      if (re.test(path)) {
         return (param: string) => {
           const b = base + '/' + (param || path)
 
@@ -46,7 +47,7 @@ export const parsePath = <T extends string>(path: T): Path<T> => {
     } else {
       const fn = p.replace(/^:/, '')
 
-      if (new RegExp('^:').test(path)) {
+      if (re.test(path)) {
         return (param?: string) => {
           const b = base + '/' + (param || path)
 
