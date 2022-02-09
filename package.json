@@ -1,6 +1,7 @@
 {
   "name": "nihonbashi",
-  "version": "1.0.0",
+  "summary": "A type-safe routing library",
+  "version": "0.1.0",
   "main": "build/index.js",
   "types": "./build/index.d.ts",
   "scripts": {
