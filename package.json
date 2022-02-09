@@ -1,0 +1,21 @@
+{
+  "name": "nihonbashi",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "types": "./build/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@swc/core": "^1.2.138",
+    "@swc/jest": "^0.2.17",
+    "@types/jest": "^27.4.0",
+    "jest": "^27.5.1",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "type-fest": "^2.11.2"
+  }
+}
