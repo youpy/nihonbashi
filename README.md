@@ -1,6 +1,6 @@
 # nihonbashi
 
-A type-safe routing library for Typescript
+A type-safe routing utility for Typescript
 
 ## install
 
