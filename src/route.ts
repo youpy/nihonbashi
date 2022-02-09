@@ -9,8 +9,8 @@ export type Route<
   : S extends `/${infer Head}/${infer Tail}`
   ? Route<`/${Tail}`, `${T}/${Head}`, U>
   : S extends `/:${infer Head}`
-  ? (param?: Merge<U, { [str in Head]: string }>) => string
-  : (param?: U) => string
+  ? (param: Merge<U, { [str in Head]: string }>) => string
+  : (param: U) => string
 
 export const route = <T extends string>(path: T): Route<T> => {
   const parts = path.split('/')
