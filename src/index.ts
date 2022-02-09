@@ -1,1 +1,1 @@
-export { Path, parsePath } from './path'
+export { Route, route } from './path'
