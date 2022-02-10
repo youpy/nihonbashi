@@ -5,12 +5,14 @@ export type Route<
   T extends string = '',
   U extends Object = {}
 > = S extends `/:${infer Head}/${infer Tail}`
-  ? Route<`/${Tail}`, `${T}/${Head}`, Merge<U, { [str in Head]: string }>>
+  ? Route<`/${Tail}`, `${T}/:${Head}`, Merge<U, { [str in Head]?: string }>>
   : S extends `/${infer Head}/${infer Tail}`
   ? Route<`/${Tail}`, `${T}/${Head}`, U>
   : S extends `/:${infer Head}`
-  ? (param: Merge<U, { [str in Head]: string }>) => string
-  : (param: U) => string
+  ? (param: Merge<U, { [str in Head]?: string }>) => `${T}/:${Head}`
+  : S extends `/${infer Head}`
+  ? (param: U) => `${T}/${Head}`
+  : (param: U) => T
 
 export const route = <T extends string>(path: T): Route<T> => {
   const parts = path.split('/')
@@ -26,11 +28,8 @@ export const route = <T extends string>(path: T): Route<T> => {
       if (part.startsWith(':')) {
         const param = part.replace(/^:/, '')
 
-        if (typeof params[param] === 'undefined') {
-          throw new Error(`Missing parameter ${param}`)
-        }
-
-        path += '/' + params[param]
+        path +=
+          '/' + (typeof params[param] !== 'undefined' ? params[param] : part)
       } else {
         path += '/' + part
       }
