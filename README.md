@@ -16,4 +16,7 @@ import { route } from 'nihonbashi'
 const r = route('/foo/:param1/bar/:param2')
 
 r({ param1: 'xxx', param2: 'yyy' }) // => '/foo/xxx/bar/yyy'
+
+// currying
+route(r({ param1: 'xxx' }))({ param2: 'yyy' }) // => '/foo/xxx/bar/yyy'
 ```

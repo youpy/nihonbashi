@@ -1,5 +1,26 @@
 import { Merge } from 'type-fest'
 
+// https://fettblog.eu/typescript-match-the-exact-object-shape/
+type ValidateShape<T, Shape> = T extends Shape
+  ? Exclude<keyof T, keyof Shape> extends never
+    ? T
+    : never
+  : never
+
+type Path<
+  S extends Object,
+  T extends string,
+  U extends string = ''
+> = T extends `/:${infer Head}/${infer Tail}`
+  ? Path<S, `/${Tail}`, `${U}/${Head extends keyof S ? Head : `:${Head}`}`>
+  : T extends `/${infer Head}/${infer Tail}`
+  ? Path<S, `/${Tail}`, `${U}/${Head}`>
+  : T extends `/:${infer Head}`
+  ? `${U}/${Head extends keyof S ? Head : `:${Head}`}`
+  : T extends `/${infer Head}`
+  ? `${U}/${Head}`
+  : U
+
 export type Route<
   S extends string,
   T extends string = '',
@@ -9,10 +30,12 @@ export type Route<
   : S extends `/${infer Head}/${infer Tail}`
   ? Route<`/${Tail}`, `${T}/${Head}`, U>
   : S extends `/:${infer Head}`
-  ? (param: Merge<U, { [str in Head]?: string }>) => `${T}/:${Head}`
+  ? <V extends Merge<U, { [str in Head]?: string }>>(
+      param: ValidateShape<V, Merge<U, { [str in Head]?: string }>>
+    ) => Path<V, `${T}/:${Head}`>
   : S extends `/${infer Head}`
-  ? (param: U) => `${T}/${Head}`
-  : (param: U) => T
+  ? <V extends U>(param: ValidateShape<V, U>) => Path<V, `${T}/${Head}`>
+  : <V extends U>(param: ValidateShape<V, U>) => Path<V, T>
 
 export const route = <T extends string>(path: T): Route<T> => {
   const parts = path.split('/')
@@ -36,5 +59,5 @@ export const route = <T extends string>(path: T): Route<T> => {
     })
 
     return path
-  }) as Route<T>
+  }) as unknown as Route<T>
 }
