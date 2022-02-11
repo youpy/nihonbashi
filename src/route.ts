@@ -34,10 +34,10 @@ export type Route<
       param: ValidateShape<V, Merge<U, { [str in Head]?: string }>>
     ) => Path<V, `${T}/:${Head}`>
   : S extends `/${infer Head}`
-  ? {} extends U
+  ? keyof U extends never
     ? () => `${T}/${Head}`
     : <V extends U>(param: ValidateShape<V, U>) => Path<V, `${T}/${Head}`>
-  : {} extends U
+  : keyof U extends never
   ? () => T
   : <V extends U>(param: ValidateShape<V, U>) => Path<V, T>
 
