@@ -4,7 +4,7 @@ describe('route', () => {
   it('parses a route', () => {
     const r = route('/foo/bar/baz')
 
-    expect(r({})).toEqual('/foo/bar/baz')
+    expect(r()).toEqual('/foo/bar/baz')
   })
 
   it('parses a route with parameters', () => {
@@ -20,5 +20,9 @@ describe('route', () => {
 
     expect(r({ param2: 'yyy' })).toEqual('/foo/xxx/bar/yyy')
     expect(r({})).toEqual('/foo/xxx/bar/:param2')
+
+    const s = route(r({ param2: 'yyy' }))
+
+    expect(s()).toEqual('/foo/xxx/bar/yyy')
   })
 })
