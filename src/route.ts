@@ -7,41 +7,41 @@ type ValidateShape<T, Shape> = T extends Shape
     : never
   : never
 
-type Path<
+type Route<
   S extends Object,
   T extends string,
   U extends string = ''
 > = T extends `/:${infer Head}/${infer Tail}`
-  ? Path<S, `/${Tail}`, `${U}/${Head extends keyof S ? Head : `:${Head}`}`>
+  ? Route<S, `/${Tail}`, `${U}/${Head extends keyof S ? Head : `:${Head}`}`>
   : T extends `/${infer Head}/${infer Tail}`
-  ? Path<S, `/${Tail}`, `${U}/${Head}`>
+  ? Route<S, `/${Tail}`, `${U}/${Head}`>
   : T extends `/:${infer Head}`
   ? `${U}/${Head extends keyof S ? Head : `:${Head}`}`
   : T extends `/${infer Head}`
   ? `${U}/${Head}`
   : U
 
-export type Route<
+export type RouteFn<
   S extends string,
   T extends string = '',
   U extends Object = {}
 > = S extends `/:${infer Head}/${infer Tail}`
-  ? Route<`/${Tail}`, `${T}/:${Head}`, Merge<U, { [str in Head]?: string }>>
+  ? RouteFn<`/${Tail}`, `${T}/:${Head}`, Merge<U, { [str in Head]?: string }>>
   : S extends `/${infer Head}/${infer Tail}`
-  ? Route<`/${Tail}`, `${T}/${Head}`, U>
+  ? RouteFn<`/${Tail}`, `${T}/${Head}`, U>
   : S extends `/:${infer Head}`
   ? <V extends Merge<U, { [str in Head]?: string }>>(
       param: ValidateShape<V, Merge<U, { [str in Head]?: string }>>
-    ) => Path<V, `${T}/:${Head}`>
+    ) => Route<V, `${T}/:${Head}`>
   : S extends `/${infer Head}`
   ? keyof U extends never
     ? () => `${T}/${Head}`
-    : <V extends U>(param: ValidateShape<V, U>) => Path<V, `${T}/${Head}`>
+    : <V extends U>(param: ValidateShape<V, U>) => Route<V, `${T}/${Head}`>
   : keyof U extends never
   ? () => T
-  : <V extends U>(param: ValidateShape<V, U>) => Path<V, T>
+  : <V extends U>(param: ValidateShape<V, U>) => Route<V, T>
 
-export const route = <T extends string>(path: T): Route<T> => {
+export const route = <T extends string>(path: T): RouteFn<T> => {
   const parts = path.split('/')
 
   if (parts[0] === '') {
@@ -63,5 +63,5 @@ export const route = <T extends string>(path: T): Route<T> => {
     })
 
     return path
-  }) as unknown as Route<T>
+  }) as unknown as RouteFn<T>
 }
