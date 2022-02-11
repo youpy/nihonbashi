@@ -1,7 +1,7 @@
 import { route } from './route'
 
 describe('route', () => {
-  it('parses a route', () => {
+  it('parses a route with no parameters', () => {
     const r = route('/foo/bar/baz')
 
     expect(r()).toEqual('/foo/bar/baz')
