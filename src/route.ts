@@ -63,5 +63,5 @@ export const route = <T extends string>(path: T): RouteFn<T> => {
     })
 
     return path
-  }) as unknown as RouteFn<T>
+  }) as RouteFn<T>
 }
