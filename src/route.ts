@@ -23,15 +23,29 @@ type Route<
 
 export type RouteFn<
   S extends string,
+  K extends Record<string, any>,
   T extends string = '',
   U extends Object = {}
 > = S extends `/:${infer Head}/${infer Tail}`
-  ? RouteFn<`/${Tail}`, `${T}/:${Head}`, Merge<U, { [str in Head]?: string }>>
+  ? RouteFn<
+      `/${Tail}`,
+      K,
+      `${T}/:${Head}`,
+      Merge<U, { [str in Head]?: str extends keyof K ? K[str] : string }>
+    >
   : S extends `/${infer Head}/${infer Tail}`
-  ? RouteFn<`/${Tail}`, `${T}/${Head}`, U>
+  ? RouteFn<`/${Tail}`, K, `${T}/${Head}`, U>
   : S extends `/:${infer Head}`
-  ? <V extends Merge<U, { [str in Head]?: string }>>(
-      param: ValidateShape<V, Merge<U, { [str in Head]?: string }>>
+  ? <
+      V extends Merge<
+        U,
+        { [str in Head]?: str extends keyof K ? K[str] : string }
+      >
+    >(
+      param: ValidateShape<
+        V,
+        Merge<U, { [str in Head]?: str extends keyof K ? K[str] : string }>
+      >
     ) => Route<V, `${T}/:${Head}`>
   : S extends `/${infer Head}`
   ? keyof U extends never
@@ -41,27 +55,29 @@ export type RouteFn<
   ? () => T
   : <V extends U>(param: ValidateShape<V, U>) => Route<V, T>
 
-export const route = <T extends string>(path: T): RouteFn<T> => {
-  const parts = path.split('/')
+export class RouteGen<K extends Record<string, any> = {}> {
+  route<T extends string>(path: T): RouteFn<T, K> {
+    const parts = path.split('/')
 
-  if (parts[0] === '') {
-    parts.shift()
+    if (parts[0] === '') {
+      parts.shift()
+    }
+
+    return ((params: Record<string, string>) => {
+      let path = ''
+
+      parts.forEach((part) => {
+        if (part.startsWith(':')) {
+          const param = part.replace(/^:/, '')
+
+          path +=
+            '/' + (typeof params[param] !== 'undefined' ? params[param] : part)
+        } else {
+          path += '/' + part
+        }
+      })
+
+      return path
+    }) as RouteFn<T, K>
   }
-
-  return ((params: Record<string, string>) => {
-    let path = ''
-
-    parts.forEach((part) => {
-      if (part.startsWith(':')) {
-        const param = part.replace(/^:/, '')
-
-        path +=
-          '/' + (typeof params[param] !== 'undefined' ? params[param] : part)
-      } else {
-        path += '/' + part
-      }
-    })
-
-    return path
-  }) as RouteFn<T>
 }

@@ -1,1 +1,1 @@
-export { RouteFn, route } from './route'
+export { RouteFn, RouteGen } from './route'
