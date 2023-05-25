@@ -54,6 +54,28 @@ describe('route', () => {
     expect(r({})).toEqual('/foo/:param1/bar/:param2')
   })
 
+  it('parses a route with default parameter type', () => {
+    const gen = new RouteGen<{}, number>()
+    const r = gen.route('/foo/:param1')
+
+    // @ts-expect-error
+    r({ param1: 'xxx' })
+
+    expect(r({ param1: 123 })).toEqual('/foo/123')
+    expect(r({})).toEqual('/foo/:param1')
+  })
+
+  it('custom type parameter overwrites default parameter type', () => {
+    const gen = new RouteGen<{ param1: string }, number>()
+    const r = gen.route('/foo/:param1')
+
+    // @ts-expect-error
+    r({ param1: 123 })
+
+    expect(r({ param1: 'xxx' })).toEqual('/foo/xxx')
+    expect(r({})).toEqual('/foo/:param1')
+  })
+
   it('supports currying', () => {
     const gen = new RouteGen()
     const r = gen.route(

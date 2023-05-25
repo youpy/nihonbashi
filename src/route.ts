@@ -24,27 +24,24 @@ type Route<
 export type RouteFn<
   S extends string,
   K extends Record<string, any>,
+  D = string,
   T extends string = '',
   U extends Object = {}
 > = S extends `/:${infer Head}/${infer Tail}`
   ? RouteFn<
       `/${Tail}`,
       K,
+      D,
       `${T}/:${Head}`,
-      Merge<U, { [str in Head]?: str extends keyof K ? K[str] : string }>
+      Merge<U, { [str in Head]?: str extends keyof K ? K[str] : D }>
     >
   : S extends `/${infer Head}/${infer Tail}`
-  ? RouteFn<`/${Tail}`, K, `${T}/${Head}`, U>
+  ? RouteFn<`/${Tail}`, K, D, `${T}/${Head}`, U>
   : S extends `/:${infer Head}`
-  ? <
-      V extends Merge<
-        U,
-        { [str in Head]?: str extends keyof K ? K[str] : string }
-      >
-    >(
+  ? <V extends Merge<U, { [str in Head]?: str extends keyof K ? K[str] : D }>>(
       param: ValidateShape<
         V,
-        Merge<U, { [str in Head]?: str extends keyof K ? K[str] : string }>
+        Merge<U, { [str in Head]?: str extends keyof K ? K[str] : D }>
       >
     ) => Route<V, `${T}/:${Head}`>
   : S extends `/${infer Head}`
@@ -55,8 +52,8 @@ export type RouteFn<
   ? () => T
   : <V extends U>(param: ValidateShape<V, U>) => Route<V, T>
 
-export class RouteGen<K extends Record<string, any> = {}> {
-  route<T extends string>(path: T): RouteFn<T, K> {
+export class RouteGen<K extends Record<string, any> = {}, D = string> {
+  route<T extends string>(path: T): RouteFn<T, K, D> {
     const parts = path.split('/')
 
     if (parts[0] === '') {
@@ -78,6 +75,6 @@ export class RouteGen<K extends Record<string, any> = {}> {
       })
 
       return path
-    }) as RouteFn<T, K>
+    }) as RouteFn<T, K, D>
   }
 }
