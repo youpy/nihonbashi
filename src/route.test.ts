@@ -11,7 +11,7 @@ describe('route', () => {
   })
 
   it('parses a route with parameters', () => {
-    const r = new RouteGen().route('/foo/:param1/bar' as const)
+    const r = new RouteGen().route('/foo/:param1/bar')
 
     expect(r({ param1: 'xxx' })).toEqual('/foo/xxx/bar')
     expect(r({})).toEqual('/foo/:param1/bar')
