@@ -23,5 +23,5 @@ r({ param1: 'xxx' as Param, param2: 'yyy' }) // => '/foo/xxx/bar/yyy'
 r({ param1: 'xxx', param2: 'yyy' }) // => error: Type 'string' is not assignable to type 'Param'.
 
 // currying
-route(r({ param1: 'xxx' as Param }))({ param2: 'yyy' }) // => '/foo/xxx/bar/yyy'
+gen.route(r({ param1: 'xxx' as Param }))({ param2: 'yyy' }) // => '/foo/xxx/bar/yyy'
 ```
