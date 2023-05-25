@@ -1,4 +1,4 @@
-import { Merge } from 'type-fest'
+type Merge<T, U> = Omit<T, keyof U> & U
 
 // https://fettblog.eu/typescript-match-the-exact-object-shape/
 type ValidateShape<T, Shape> = T extends Shape
