@@ -1,9 +1,8 @@
 type Merge<T, U> = Omit<T, keyof U> & U
 
-// https://fettblog.eu/typescript-match-the-exact-object-shape/
-type ValidateShape<T, Shape> = T extends Shape
+type Args<T, Shape> = T extends Shape
   ? Exclude<keyof T, keyof Shape> extends never
-    ? T
+    ? [T] | []
     : never
   : never
 
@@ -39,36 +38,34 @@ export type RouteFn<
   ? RouteFn<`/${Tail}`, K, D, `${T}/${Head}`, U>
   : S extends `/:${infer Head}`
   ? <V extends Merge<U, { [str in Head]?: str extends keyof K ? K[str] : D }>>(
-      param: ValidateShape<
+      ...args: Args<
         V,
         Merge<U, { [str in Head]?: str extends keyof K ? K[str] : D }>
       >
     ) => Route<V, `${T}/:${Head}`>
   : S extends `/${infer Head}`
-  ? keyof U extends never
-    ? () => `${T}/${Head}`
-    : <V extends U>(param: ValidateShape<V, U>) => Route<V, `${T}/${Head}`>
+  ? <V extends U>(...args: Args<V, U>) => Route<V, `${T}/${Head}`>
   : keyof U extends never
   ? () => T
-  : <V extends U>(param: ValidateShape<V, U>) => Route<V, T>
+  : <V extends U>(...args: Args<V, U>) => Route<V, T>
 
 export class RouteGen<K extends Record<string, any> = {}, D = string> {
-  route<T extends string>(path: T): RouteFn<T, K, D> {
+  route<T extends `/${string}`>(path: T): RouteFn<T, K, D> {
     const parts = path.split('/')
 
     if (parts[0] === '') {
       parts.shift()
     }
 
-    return ((params: Record<string, string>) => {
+    return ((params?: Record<string, string>) => {
+      const p = params || {}
       let path = ''
 
       parts.forEach((part) => {
         if (part.startsWith(':')) {
           const param = part.replace(/^:/, '')
 
-          path +=
-            '/' + (typeof params[param] !== 'undefined' ? params[param] : part)
+          path += '/' + (typeof p[param] !== 'undefined' ? p[param] : part)
         } else {
           path += '/' + part
         }
