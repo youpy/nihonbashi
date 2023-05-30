@@ -4,9 +4,14 @@
   "version": "1.2.0",
   "main": "build/index.js",
   "types": "./build/index.d.ts",
+  "files": [
+    "build/**/*"
+  ],
   "scripts": {
     "test": "tsc --noEmit && jest",
-    "build": "tsc"
+    "build": "tsc --project tsconfig.build.json",
+    "prepare": "pnpm build",
+    "prepublishOnly": "pnpm test"
   },
   "license": "MIT",
   "devDependencies": {
